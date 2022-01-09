@@ -8,13 +8,13 @@ import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    static final int SCREEN_WIDTH = 600;
-    static final int SCREEN_HEIGHT = 600;
-    static final int UNIT_SIZE = 25;
-    static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
+    static final int SCREEN_WIDTH = 700;
+    static final int SCREEN_HEIGHT = 700;
+    static final int UNIT_SIZE = 20;
     static final int DELAY = 75;
-    final int x[] = new int[UNIT_SIZE];
-    final int y[] = new int[UNIT_SIZE];
+    static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
+    final int x[] = new int[GAME_UNITS];
+    final int y[] = new int[GAME_UNITS];
     int bodyParts = 6;
     int applesEaten = 0;
     int appleX;
@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements ActionListener {
     GamePanel() {
         random = new Random();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
-        this.setBackground(Color.BLACK);
+        this.setBackground(new Color(255, 184, 95));
         this.setFocusable(true);
         this.addKeyListener(new MyKeyAdapter());
         startGame();
@@ -46,39 +46,45 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g) {
-        // draws grid
-//        g.setColor(Color.white);
-//        for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
-//            g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
-//            g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
-//        }
 
         if (running) {
             // draws apples
-            g.setColor(Color.red);
+            g.setColor(new Color(255, 122, 90));
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
             // draws snake
             for (int i = 0; i < bodyParts; i++) {
+                // snake head
                 if (i == 0) {
-                    g.setColor(Color.green);
-//                    g.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+                    g.setColor(new Color(0, 170, 160));
                     g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                    // snake body
                 } else {
-                    g.setColor(new Color(45, 180, 0));
-                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                    // celebration color when reached multiples of 10
+                    if (applesEaten % 10 == 0 && applesEaten != 0) {
+                        g.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+                        g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                    }
+                    // regular color
+                    else {
+                        g.setColor(new Color(142, 210, 201));
+                        g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                    }
                 }
             }
-            g.setColor(Color.red);
-            g.setFont(new Font("Chalkduster", Font.BOLD, 40));
+
+            // draw score at the top of the panel
+            g.setColor(new Color(70, 32, 102));
+            g.setFont(new Font("Chalkduster", Font.BOLD, 30));
             FontMetrics metrics = getFontMetrics(g.getFont());
-            g.drawString("Score: " + applesEaten,
-                    (SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten)) / 2, g.getFont().getSize());
+            g.drawString("" + applesEaten,
+                    (SCREEN_WIDTH - metrics.stringWidth("" + applesEaten)) / 2, g.getFont().getSize());
         } else {
             gameOver(g);
         }
     }
 
+    // generate apples on the field
     public void newApple() {
         appleX = random.nextInt(SCREEN_WIDTH / UNIT_SIZE) * UNIT_SIZE;
         appleY = random.nextInt(SCREEN_WIDTH / UNIT_SIZE) * UNIT_SIZE;
@@ -91,6 +97,7 @@ public class GamePanel extends JPanel implements ActionListener {
             y[i] = y[i - 1];
         }
 
+        // decides where to add new body part
         switch (direction) {
             case 'U' -> y[0] = y[0] - UNIT_SIZE;
             case 'D' -> y[0] = y[0] + UNIT_SIZE;
@@ -142,17 +149,17 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void gameOver(Graphics g) {
         // display score
-        g.setColor(Color.red);
+        g.setColor(new Color(70, 32, 102));
         g.setFont(new Font("Chalkduster", Font.BOLD, 40));
         FontMetrics metrics1 = getFontMetrics(g.getFont());
-        g.drawString("Score: " + applesEaten,
-                (SCREEN_WIDTH - metrics1.stringWidth("Score: " + applesEaten)) / 2, g.getFont().getSize());
+        g.drawString("" + applesEaten,
+                (SCREEN_WIDTH - metrics1.stringWidth("" + applesEaten)) / 2, g.getFont().getSize());
 
         // game over text
-        g.setColor(Color.red);
+        g.setColor(new Color(70, 32, 102));
         g.setFont(new Font("Chalkduster", Font.BOLD, 75));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
-        g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
+        g.drawString("GAME OVER", (SCREEN_WIDTH - metrics2.stringWidth("GAME OVER")) / 2, SCREEN_HEIGHT / 2);
     }
 
     @Override
@@ -165,6 +172,7 @@ public class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
 
+    // moving with arrow keys
     public class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
